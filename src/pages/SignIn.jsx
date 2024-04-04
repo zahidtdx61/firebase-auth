@@ -34,6 +34,9 @@ const SignIn = () => {
       const user = userCredential.user;
       console.log(user);
       setRegisterSuccess("User Logged In Successfully");
+      if (!user.emailVerified) {
+        toast.error("User email is not verified");
+      }
     } catch (error) {
       console.log(error.message);
       setRegisterError(error.message);
