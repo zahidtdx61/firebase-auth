@@ -1,9 +1,17 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import auth from "../config/firebase/firebase.init";
 
 const SignIn = () => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const isValidEmail = (email) => emailRegex.test(email);
+
+  const emailRef = useRef();
   const [registerError, setRegisterError] = useState();
   const [registerSuccess, setRegisterSuccess] = useState();
   const [isPasswordHidden, setPasswordHidden] = useState(true);
@@ -32,8 +40,32 @@ const SignIn = () => {
     }
   };
 
+  const handleForgetPassword = async () => {
+    const email = emailRef.current.value;
+
+    if (!email) {
+      console.log("click forget", email);
+      toast.error("Please enter your email");
+      return;
+    } else if (!isValidEmail(email)) {
+      console.log("Invalid email", email);
+      toast.error("Please enter a valid email");
+      return;
+    }
+
+    console.log("Valid email", email);
+    try {
+      const result = await sendPasswordResetEmail(auth, email);
+      console.log(result);
+      toast.success("Password reset email sent");
+    } catch (error) {
+      console.log(error.message);
+      toast.error(error.message);
+    }
+  };
+
   return (
-    <main className="w-full h-fit flex flex-col items-center justify-center bg-gray-50 sm:px-4">
+    <main className="w-full h-fit py-4 min-h-screen flex flex-col items-center justify-center bg-gray-50 sm:px-4">
       <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
         <div className="text-center">
           <div className="mt-5 space-y-2">
@@ -159,6 +191,7 @@ const SignIn = () => {
             <div>
               <label className="font-medium">Email</label>
               <input
+                ref={emailRef}
                 name="email"
                 type="email"
                 required
@@ -233,7 +266,7 @@ const SignIn = () => {
           {registerError && <p className="text-red-700">{registerError}</p>}
         </div>
         <div className="text-center">
-          <a href="javascript:void(0)" className="hover:text-indigo-600">
+          <a onClick={handleForgetPassword} className="hover:text-indigo-600">
             Forgot password?
           </a>
         </div>
