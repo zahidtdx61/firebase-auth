@@ -6,6 +6,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import auth from "../config/firebase/firebase.init";
+import { Helmet } from "react-helmet-async";
 
 const SignUp = () => {
   const [registerError, setRegisterError] = useState();
@@ -53,6 +54,10 @@ const SignUp = () => {
 
   return (
     <main className="w-full h-fit py-4 min-h-screen flex flex-col items-center justify-center bg-gray-50 sm:px-4">
+      <Helmet>
+        <title>Sign Up</title>
+      </Helmet>
+
       <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
         <div className="text-center">
           <div className="mt-5 space-y-2">

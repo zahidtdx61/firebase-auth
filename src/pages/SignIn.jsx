@@ -1,4 +1,5 @@
 import {
+  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
@@ -6,6 +7,7 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import auth from "../config/firebase/firebase.init";
+import { Helmet } from "react-helmet-async";
 
 const SignIn = () => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -33,9 +35,12 @@ const SignIn = () => {
       );
       const user = userCredential.user;
       console.log(user);
-      setRegisterSuccess("User Logged In Successfully");
-      if (!user.emailVerified) {
-        toast.error("User email is not verified");
+      if (user.emailVerified) {
+        toast.success("Welcome");
+        setRegisterSuccess("User Logged In Successfully");
+      } else {
+        await sendEmailVerification(user);
+        toast.error("User email is not verified. Check your email.");
       }
     } catch (error) {
       console.log(error.message);
@@ -69,6 +74,10 @@ const SignIn = () => {
 
   return (
     <main className="w-full h-fit py-4 min-h-screen flex flex-col items-center justify-center bg-gray-50 sm:px-4">
+      <Helmet>
+        <title>Sign In</title>
+      </Helmet>
+
       <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
         <div className="text-center">
           <div className="mt-5 space-y-2">
