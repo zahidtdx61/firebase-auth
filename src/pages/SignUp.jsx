@@ -1,5 +1,9 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import auth from "../config/firebase/firebase.init";
 
@@ -36,6 +40,11 @@ const SignUp = () => {
       const user = userCredential.user;
       console.log(user);
       setRegisterSuccess("User created successfully.");
+
+      await sendEmailVerification(user);
+      toast.success(
+        "Check your email and Verify your email using the provided link"
+      );
     } catch (error) {
       console.log("Error:", error.code, error.message);
       setRegisterError(error.message);
