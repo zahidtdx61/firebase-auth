@@ -1,11 +1,39 @@
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import auth from "../config/firebase/firebase.init";
 
 const SignIn = () => {
+  const [registerError, setRegisterError] = useState();
+  const [registerSuccess, setRegisterSuccess] = useState();
   const [isPasswordHidden, setPasswordHidden] = useState(true);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setRegisterError("");
+    setRegisterSuccess("");
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log(user);
+      setRegisterSuccess("User Logged In Successfully");
+    } catch (error) {
+      console.log(error.message);
+      setRegisterError(error.message);
+    }
+  };
+
   return (
-    <main className="w-full h-screen flex flex-col items-center justify-center bg-gray-50 sm:px-4">
+    <main className="w-full h-fit flex flex-col items-center justify-center bg-gray-50 sm:px-4">
       <div className="w-full space-y-6 text-gray-600 sm:max-w-md">
         <div className="text-center">
           <div className="mt-5 space-y-2">
@@ -127,10 +155,11 @@ const SignIn = () => {
               Or continue with
             </p>
           </div>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+          <form onSubmit={(e) => handleSubmit(e)} className="space-y-5">
             <div>
               <label className="font-medium">Email</label>
               <input
+                name="email"
                 type="email"
                 required
                 className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
@@ -140,11 +169,11 @@ const SignIn = () => {
             <div>
               <label className="text-gray-600">Password</label>
               <div className="relative max-w-full mt-2">
-                <button
-                  className="text-gray-400 absolute right-3 inset-y-0 my-auto active:text-gray-600"
+                <span
+                  className="text-gray-400 absolute top-4 right-3 inset-y-0 my-auto active:text-gray-600"
                   onClick={() => setPasswordHidden(!isPasswordHidden)}
                 >
-                  {isPasswordHidden ? (
+                  {!isPasswordHidden ? (
                     <svg
                       className="w-6 h-6"
                       xmlns="http://www.w3.org/2000/svg"
@@ -180,8 +209,10 @@ const SignIn = () => {
                       />
                     </svg>
                   )}
-                </button>
+                </span>
                 <input
+                  name="password"
+                  required
                   type={isPasswordHidden ? "password" : "text"}
                   placeholder="Enter your password"
                   className="w-full mt-2 px-3 py-2 text-gray-500 bg-transparent outline-none border focus:border-indigo-600 shadow-sm rounded-lg"
@@ -193,6 +224,13 @@ const SignIn = () => {
               Sign in
             </button>
           </form>
+
+          {/* sign up success */}
+          {registerSuccess && (
+            <p className="text-green-700">{registerSuccess}</p>
+          )}
+          {/* error message */}
+          {registerError && <p className="text-red-700">{registerError}</p>}
         </div>
         <div className="text-center">
           <a href="javascript:void(0)" className="hover:text-indigo-600">
