@@ -1,12 +1,13 @@
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updateProfile,
 } from "firebase/auth";
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import auth from "../config/firebase/firebase.init";
-import { Helmet } from "react-helmet-async";
 
 const SignUp = () => {
   const [registerError, setRegisterError] = useState();
@@ -46,6 +47,8 @@ const SignUp = () => {
       toast.success(
         "Check your email and Verify your email using the provided link"
       );
+
+      await updateProfile(user, { displayName: name, photoURL: 'nothing' });
     } catch (error) {
       console.log("Error:", error.code, error.message);
       setRegisterError(error.message);
